@@ -17,8 +17,7 @@ async function getScooters() {
 }
 
 export default async function Dashboard() {
-    const data = await getScooters();
-    const scooters = data.scooters;
+    const scooters = await getScooters();
 
     return (
         <div style={{ minHeight: "100vh", background: "#0d0000", color: "#fff", position: "relative", overflow: "hidden" }}>
