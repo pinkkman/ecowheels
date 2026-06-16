@@ -4,7 +4,7 @@ import {showroom} from "@/data/showroom";
 
 async function getScooter(id: string) {
     const res = await fetch(
-        `http://localhost:3000/api/scooters/${id}`,
+        `/api/scooters/${id}`,
         { cache: "no-store" }
     );
     return res.json();
