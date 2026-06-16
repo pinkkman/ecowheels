@@ -1,16 +1,21 @@
 import ScooterCard from "@/components/ScooterCard";
 import ParticleBackground from "@/components/ParticleBackground";
+import { connectDB } from "@/lib/db";
+import Scooter from "@/models/Scooter";
 
 async function getScooters() {
-    const res = await fetch("/api/scooters", {
-        cache: "no-store",
+    await connectDB();
+
+    const scooters = await Scooter.find().sort({
+        createdAt: -1,
     });
-    return res.json();
+
+    return scooters;
 }
 
 export default async function ScootersPage() {
-    const data = await getScooters();
-    const scooters = data.scooters;
+    const scooters = await getScooters();
+
 
     return (
         <div style={{ minHeight: "100vh", background: "#0d0000", color: "#fff", position: "relative", overflow: "hidden" }}>
