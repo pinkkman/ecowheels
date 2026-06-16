@@ -3,11 +3,17 @@ import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
 import ParticleBackground from "@/components/ParticleBackground";
 
+import { connectDB } from "@/lib/db";
+import Scooter from "@/models/Scooter";
+
 async function getScooters() {
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/scooters`, {
-        cache: "no-store",
-    });
-    return res.json();
+    await connectDB();
+
+    const scooters = await Scooter.find()
+        .sort({ createdAt: -1 })
+        .lean();
+
+    return JSON.parse(JSON.stringify(scooters));
 }
 
 export default async function Dashboard() {

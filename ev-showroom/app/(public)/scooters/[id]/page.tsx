@@ -2,14 +2,20 @@ import WhatsAppEnquiryButton from "@/components/whatsAppEnquiryButton";
 import ParticleBackground from "@/components/ParticleBackground";
 import {showroom} from "@/data/showroom";
 
-async function getScooter(id: string) {
-    const res = await fetch(
-        `${process.env.NEXTAUTH_URL}/api/scooters/${id}`,
-        { cache: "no-store" }
-    );
-    return res.json();
-}
+import { connectDB } from "@/lib/db";
+import Scooter from "@/models/Scooter";
 
+async function getScooter(id: string) {
+    await connectDB();
+
+    const scooter = await Scooter.findById(id).lean();
+
+    if (!scooter) {
+        return null;
+    }
+
+    return JSON.parse(JSON.stringify(scooter));
+}
 export default async function ScooterDetails({
                                                  params,
                                              }: {
