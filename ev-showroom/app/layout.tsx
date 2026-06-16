@@ -1,19 +1,18 @@
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 import Providers from "@/components/Providers";
 
 export default function RootLayout({
-                                     children,
+                                       children,
                                    }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-      <html lang="en">
-      <Providers>
-      <body>
-      {children}
-      </body>
-      </Providers>
-      </html>
-  );
+    return (
+        <html lang="en">
+        <body>
+        <Providers>
+            {children}
+        </Providers>
+        </body>
+        </html>
+    );
 }
