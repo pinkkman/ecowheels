@@ -4,7 +4,7 @@ import LogoutButton from "@/components/LogoutButton";
 import ParticleBackground from "@/components/ParticleBackground";
 
 async function getScooters() {
-    const res = await fetch("/api/scooters", {
+    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/scooters`, {
         cache: "no-store",
     });
     return res.json();
