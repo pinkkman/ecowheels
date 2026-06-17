@@ -22,8 +22,7 @@ export default async function ScooterDetails({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const data = await getScooter(id);
-    const scooter = data.scooter;
+    const scooter = await getScooter(id);
 
     return (
         <div style={{ minHeight: "100vh", background: "#0d0000", color: "#fff", position: "relative", overflow: "hidden" }}>

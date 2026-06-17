@@ -26,6 +26,6 @@ export default async function EditPage({
 
     return (
 
-        <EditForm scooter={data.scooter} />
+        <EditForm scooter={data} />
     );
 }
