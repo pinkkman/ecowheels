@@ -340,6 +340,80 @@ export default function Home() {
           letter-spacing: 0.1em;
           text-transform: uppercase;
         }
+
+        /* ---------- Footer ---------- */
+        .site-footer {
+          position: relative;
+          z-index: 1;
+          border-top: 1px solid rgba(139,0,0,0.35);
+          background: rgba(15,0,0,0.55);
+          padding: 3.5rem 1.25rem 2rem;
+        }
+
+        .footer-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1.3fr;
+          gap: 2rem;
+          max-width: 980px;
+          margin: 0 auto;
+        }
+
+        @media (max-width: 760px) {
+          .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 2.25rem;
+            text-align: center;
+          }
+        }
+
+        .footer-heading {
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 1.05rem;
+          letter-spacing: 0.08em;
+          color: #ff4444;
+          margin-bottom: 0.75rem;
+          text-transform: uppercase;
+        }
+
+        .footer-text {
+          font-family: 'Inter', sans-serif;
+          font-weight: 300;
+          font-size: 0.88rem;
+          line-height: 1.7;
+          color: rgba(255,255,255,0.6);
+          letter-spacing: 0.02em;
+        }
+
+        .footer-link {
+          color: rgba(255,255,255,0.75);
+          text-decoration: none;
+          transition: color 0.25s;
+        }
+        .footer-link:hover {
+          color: #ff6666;
+        }
+
+        .map-frame {
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1px solid rgba(139,0,0,0.4);
+          filter: grayscale(0.25) contrast(1.05);
+        }
+
+        .footer-bottom {
+          max-width: 980px;
+          margin: 2.5rem auto 0;
+          padding-top: 1.5rem;
+          border-top: 1px solid rgba(255,255,255,0.08);
+          text-align: center;
+        }
+
+        .footer-copy {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.72rem;
+          color: rgba(255,255,255,0.35);
+          letter-spacing: 0.04em;
+        }
       `}</style>
 
         <div className="hero-wrap">
@@ -383,6 +457,48 @@ export default function Home() {
           </div>
 
         </div>
+
+        <footer className="site-footer">
+          <div className="footer-grid">
+            <div>
+              <h3 className="footer-heading">Visit Us</h3>
+              <p className="footer-text">
+                Eco Wheels Rourkela<br />
+                Gaffur Colony, Uditnagar<br />
+                Rourkela, Odisha
+              </p>
+            </div>
+
+            <div>
+              <h3 className="footer-heading">Contact</h3>
+              <p className="footer-text">
+                <a href="tel:+918917485620" className="footer-link">+91 89174 85620</a><br />
+                <a href="tel:+918280531114" className="footer-link">+91 82805 31114</a>
+              </p>
+            </div>
+
+            <div>
+              <h3 className="footer-heading">Find Us</h3>
+              <div className="map-frame">
+                <iframe
+                    title="Eco Wheels Rourkela location"
+                    src="https://www.google.com/maps?q=Gaffur+Colony,+Uditnagar,+Rourkela,+Odisha&output=embed"
+                    width="100%"
+                    height="190"
+                    style={{ border: 0, display: "block" }}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p className="footer-copy">
+              © {new Date().getFullYear()} Eco Wheels Rourkela. All rights reserved.
+            </p>
+          </div>
+        </footer>
       </main>
   );
 }
