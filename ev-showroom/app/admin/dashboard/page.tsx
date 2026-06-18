@@ -242,7 +242,10 @@ export default async function Dashboard() {
                     .admin-wrap { padding: 2rem 1rem 3rem; }
                     .page-header { flex-direction: column; align-items: flex-start; }
                     .btn-add { width: 100%; justify-content: center; }
-                    .nav-greeting { display: none; }
+                    .admin-nav-inner { flex-wrap: wrap; gap: 0.4rem; padding: 0.7rem 1rem; }
+                    .nav-brand { flex-wrap: wrap; gap: 0.5rem; }
+                    .nav-title { font-size: 0.82rem; }
+                    .nav-greeting { font-size: 0.75rem; }
                     .nav-separator { display: none; }
                 }
             `}</style>

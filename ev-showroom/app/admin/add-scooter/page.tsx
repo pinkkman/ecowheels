@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import ParticleBackground from "@/components/ParticleBackground";
+import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 
 export default function AddScooterPage() {
+  
     const [form, setForm] = useState({
         name: "",
         price: "",
