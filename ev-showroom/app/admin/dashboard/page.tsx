@@ -231,6 +231,7 @@ export default async function Dashboard() {
                     <div className="nav-brand">
                         <div className="nav-logo">A</div>
                         <span className="nav-title">Admin Console</span>
+                        <span className="nav-title">Admin Console</span>
                     </div>
                     <LogoutButton />
                 </div>
