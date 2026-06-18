@@ -38,20 +38,20 @@ export async function GET() {
         scooters,
     });
 }
-export async function PUT(
-    req: Request,
-    { params }: { params: { id: string } }
-) {
-    await connectDB();
-
-    const body = await req.json();
-
-    await Scooter.findByIdAndUpdate(
-        params.id,
-        body
-    );
-
-    return NextResponse.json({
-        success: true,
-     });
- }
+// export async function PUT(
+//     req: Request,
+//     { params }: { params: { id: string } }
+// ) {
+//     await connectDB();
+//
+//     const body = await req.json();
+//
+//     await Scooter.findByIdAndUpdate(
+//         params.id,
+//         body
+//     );
+//
+//     return NextResponse.json({
+//         success: true,
+//      });
+//  }
