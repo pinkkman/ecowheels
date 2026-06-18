@@ -2,7 +2,8 @@ import AdminScooterCard from "@/components/AdminScooterCard";
 import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
 import ParticleBackground from "@/components/ParticleBackground";
-
+import { getServerSession } from "next-auth";
+import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 import { connectDB } from "@/lib/db";
 import Scooter from "@/models/Scooter";
 
@@ -16,8 +17,11 @@ async function getScooters() {
     return JSON.parse(JSON.stringify(scooters));
 }
 
+
 export default async function Dashboard() {
     const scooters = await getScooters();
+    const session = await getServerSession(authOptions);
+    const username = session?.user?.name || session?.user?.email || "Admin";
 
     return (
         <div style={{ minHeight: "100vh", background: "#0d0000", color: "#fff", position: "relative", overflow: "hidden" }}>
@@ -78,6 +82,24 @@ export default async function Dashboard() {
                     font-weight: 600;
                     color: rgba(255,255,255,0.85);
                     letter-spacing: 0.02em;
+                }
+                .nav-separator {
+                    width: 1px;
+                    height: 18px;
+                    background: rgba(139,0,0,0.5);
+                    margin: 0 0.25rem;
+                }
+                .nav-greeting {
+                    font-family: 'Inter', sans-serif;
+                    font-size: 0.82rem;
+                    font-weight: 400;
+                    color: rgba(255,255,255,0.4);
+                    letter-spacing: 0.02em;
+                    white-space: nowrap;
+                }
+                .nav-greeting span {
+                    color: #ff6b6b;
+                    font-weight: 600;
                 }
 
                 .admin-wrap {
@@ -220,6 +242,8 @@ export default async function Dashboard() {
                     .admin-wrap { padding: 2rem 1rem 3rem; }
                     .page-header { flex-direction: column; align-items: flex-start; }
                     .btn-add { width: 100%; justify-content: center; }
+                    .nav-greeting { display: none; }
+                    .nav-separator { display: none; }
                 }
             `}</style>
 
@@ -231,7 +255,8 @@ export default async function Dashboard() {
                     <div className="nav-brand">
                         <div className="nav-logo">A</div>
                         <span className="nav-title">Admin Console</span>
-                        <span className="nav-title">Admin Console</span>
+                        <div className="nav-separator" />
+                        <span className="nav-greeting">Hello, <span>{username}</span></span>
                     </div>
                     <LogoutButton />
                 </div>
