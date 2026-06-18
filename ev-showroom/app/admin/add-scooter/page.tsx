@@ -1,12 +1,12 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import ParticleBackground from "@/components/ParticleBackground";
 import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 
 export default function AddScooterPage() {
-  
+const router =useRouter();
     const [form, setForm] = useState({
         name: "",
         price: "",
@@ -84,6 +84,8 @@ export default function AddScooterPage() {
                 setForm({ name: "", price: "", range: "", topSpeed: "", battery: "", description: "" });
                 setImageFiles([]);
                 setPreviews([]);
+                router.push("/admin/dashboard");
+
             } else {
                 alert("Failed to add scooter.");
             }
