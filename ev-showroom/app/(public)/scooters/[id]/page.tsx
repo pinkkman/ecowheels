@@ -6,9 +6,13 @@ import { connectDB } from "@/lib/db";
 import Scooter from "@/models/Scooter";
 
 async function getScooter(id: string) {
+    console.log("Searching ID:", id);
+
     await connectDB();
 
     const scooter = await Scooter.findById(id).lean();
+
+    console.log("Found:", scooter);
 
     if (!scooter) {
         return null;
