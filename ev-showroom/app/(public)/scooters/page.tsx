@@ -1,3 +1,4 @@
+export const revalidate = 0;
 import ScooterCard from "@/components/ScooterCard";
 import ParticleBackground from "@/components/ParticleBackground";
 import { connectDB } from "@/lib/db";
@@ -6,13 +7,18 @@ import Scooter from "@/models/Scooter";
 async function getScooters() {
     await connectDB();
 
-    const scooters = await Scooter.find().sort({
-        createdAt: -1,
-    });
+    const scooters = await Scooter.find()
+        .sort({ createdAt: -1 })
+        .lean();
 
-    return scooters;
+    console.log(
+        "PUBLIC PAGE SCOOTERS:",
+        scooters.length,
+        scooters.map((s: any) => s.name)
+    );
+
+    return JSON.parse(JSON.stringify(scooters));
 }
-
 export default async function ScootersPage() {
     const scooters = await getScooters();
 
