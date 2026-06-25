@@ -64,21 +64,22 @@ export default async function ScooterDetails({
                     }
                 }
 
-                .image-carousel {
-                    display: flex;
-                    gap: 12px;
-                    overflow-x: auto;
-                    scroll-snap-type: x mandatory;
-                    scrollbar-width: none;
-                    -ms-overflow-style: none;
-                    padding-bottom: 8px;
-                }
-                .image-carousel::-webkit-scrollbar { display: none; }
+           .image-carousel {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 8px;
+}
+
 .carousel-image {
     flex: 0 0 90%;
     width: 90%;
-    aspect-ratio: 4/3;
-    object-fit: contain;   
+    height: auto;
+    max-height: 70vh;        /* 👈 prevents it from being absurdly tall on portrait images */
+    object-fit: contain;
     border-radius: 20px;
     border: 1px solid rgba(139,0,0,0.4);
     scroll-snap-align: center;

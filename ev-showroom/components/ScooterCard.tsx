@@ -48,10 +48,11 @@ export default function ScooterCard({ scooter }: { scooter: Scooter }) {
         .scooter-card:active {
           transform: scale(0.97);
           opacity: 0.9;
-        }
+            }
 .card-img-wrap {
   width: 100%;
-  height: 210px;
+  height: auto;
+  max-height: 280px;       /* 👈 cap so very tall photos don't dominate the grid */
   overflow: hidden;
   background: rgba(60,0,0,0.3);
   display: flex;
@@ -60,8 +61,9 @@ export default function ScooterCard({ scooter }: { scooter: Scooter }) {
 }
 .card-img-wrap img {
   width: 100%;
-  height: 100%;
-  object-fit: contain; 
+  height: auto;
+  max-height: 280px;
+  object-fit: contain;     /* 👈 changed from cover */
   transition: transform 0.4s ease;
 }
         .scooter-card:hover .card-img-wrap img {
