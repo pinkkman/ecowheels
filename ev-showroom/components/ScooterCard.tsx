@@ -49,19 +49,21 @@ export default function ScooterCard({ scooter }: { scooter: Scooter }) {
           transform: scale(0.97);
           opacity: 0.9;
         }
-
-        .card-img-wrap {
-          width: 100%;
-          height: 210px;
-          overflow: hidden;
-          background: rgba(60,0,0,0.3);
-        }
-        .card-img-wrap img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.4s ease;
-        }
+.card-img-wrap {
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  background: rgba(60,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; 
+  transition: transform 0.4s ease;
+}
         .scooter-card:hover .card-img-wrap img {
           transform: scale(1.06);
         }

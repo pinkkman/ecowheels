@@ -74,17 +74,16 @@ export default async function ScooterDetails({
                     padding-bottom: 8px;
                 }
                 .image-carousel::-webkit-scrollbar { display: none; }
-
-                .carousel-image {
-                    flex: 0 0 90%;
-                    width: 90%;
-                    aspect-ratio: 4/3;
-                    object-fit: cover;
-                    border-radius: 20px;
-                    border: 1px solid rgba(139,0,0,0.4);
-                    scroll-snap-align: center;
-                    background: rgba(100,0,0,0.15);
-                }
+.carousel-image {
+    flex: 0 0 90%;
+    width: 90%;
+    aspect-ratio: 4/3;
+    object-fit: contain;   
+    border-radius: 20px;
+    border: 1px solid rgba(139,0,0,0.4);
+    scroll-snap-align: center;
+    background: rgba(100,0,0,0.15);
+}
 
                 .swipe-hint {
                     margin-top: 12px;
