@@ -482,7 +482,8 @@ export default function Home() {
               <div className="map-frame">
                 <iframe
                     title="Eco Wheels Rourkela location"
-                    src="https://www.google.com/maps?q=Gaffur+Colony,+Uditnagar,+Rourkela,+Odisha&output=embed"
+                src="https://www.google.com/maps?q=22.2273097,84.8434847&output=embed"
+                
                     width="100%"
                     height="190"
                     style={{ border: 0, display: "block" }}
