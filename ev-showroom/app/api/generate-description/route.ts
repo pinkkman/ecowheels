@@ -1,35 +1,42 @@
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY!,
+  baseURL: "https://api.groq.com/openai/v1",
 });
 
 export async function POST(req: Request) {
   try {
     const { name, range, topSpeed, battery } = await req.json();
 
-    const prompt = `
-Generate a professional scooter showroom description.
-
+    const completion = await client.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a professional EV showroom copywriter. Generate attractive scooter descriptions between 60 and 100 words.",
+        },
+        {
+          role: "user",
+          content: `
 Scooter Name: ${name}
 Range: ${range} km
 Top Speed: ${topSpeed} km/h
 Battery: ${battery}
-
-Keep it between 60-100 words.
-Make it attractive and customer-friendly.
-`;
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
+`,
+        },
+      ],
     });
 
     return NextResponse.json({
-      description: response.text,
+      description:
+        completion.choices[0].message.content,
     });
-  } catch (error) {
+  } catch (err) {
+    console.error(err);
+
     return NextResponse.json(
       { error: "Failed to generate description" },
       { status: 500 }
