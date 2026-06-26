@@ -1,15 +1,22 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-const client = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY!,
-  baseURL: "https://api.groq.com/openai/v1",
-});
 
 export async function POST(req: Request) {
   try {
     const { name, range, topSpeed, battery } = await req.json();
+    const apiKey = process.env.GROQ_API_KEY;
+ if (!apiKey) {
+    return Response.json(
+      { error: "GROQ_API_KEY is missing" },
+      { status: 500 }
+    );
+  }
 
+  const client = new OpenAI({
+    apiKey,
+    baseURL: "https://api.groq.com/openai/v1",
+  });
     const completion = await client.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
@@ -42,4 +49,5 @@ Battery: ${battery}
       { status: 500 }
     );
   }
+  
 }
