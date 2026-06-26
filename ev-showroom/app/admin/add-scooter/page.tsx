@@ -7,6 +7,7 @@ import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 
 export default function AddScooterPage() {
 const router =useRouter();
+const [loadingAI, setLoadingAI] = useState(false);
     const [form, setForm] = useState({
         name: "",
         price: "",
@@ -95,8 +96,42 @@ const router =useRouter();
         } finally {
             setLoading(false);
         }
+        
     };
+const generateDescription = async () => {
+    if (!form.name || !form.range || !form.topSpeed || !form.battery) {
+        alert("Please fill Name, Range, Top Speed and Battery first.");
+        return;
+    }
 
+    setLoadingAI(true);
+
+    try {
+        const res = await fetch("/api/generate-description", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: form.name,
+                range: form.range,
+                topSpeed: form.topSpeed,
+                battery: form.battery,
+            }),
+        });
+
+        const data = await res.json();
+
+        setForm((prev) => ({
+            ...prev,
+            description: data.description,
+        }));
+    } catch (err) {
+        alert("Failed to generate description.");
+    } finally {
+        setLoadingAI(false);
+    }
+};
     return (
         <div style={{ minHeight: "100vh", background: "#0d0000", color: "#fff", position: "relative", overflow: "hidden" }}>
             <style>{`
@@ -444,17 +479,44 @@ const router =useRouter();
                     </div>
 
                     {/* Description */}
-                    <div>
-                        <label className="field-label">Description</label>
-                        <textarea
-                            name="description"
-                            placeholder="Briefly describe the scooter..."
-                            value={form.description}
-                            onChange={handleChange}
-                            className="field-textarea"
-                            required
-                        />
-                    </div>
+               <div>
+    <div
+        style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "10px",
+        }}
+    >
+        <label className="field-label">Description</label>
+
+        <button
+            type="button"
+            onClick={generateDescription}
+            disabled={loadingAI}
+            style={{
+                background: "#8B0000",
+                color: "white",
+                border: "none",
+                padding: "8px 14px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontSize: "13px",
+            }}
+        >
+            {loadingAI ? "Generating..." : "✨ AI Suggest"}
+        </button>
+    </div>
+
+    <textarea
+        name="description"
+        placeholder="Briefly describe the scooter..."
+        value={form.description}
+        onChange={handleChange}
+        className="field-textarea"
+        required
+    />
+</div>
 
                     {/* Image */}
                     <div>
