@@ -1,53 +1,38 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+});
 
 export async function POST(req: Request) {
   try {
     const { name, range, topSpeed, battery } = await req.json();
-    const apiKey = process.env.GROQ_API_KEY;
- if (!apiKey) {
-    return Response.json(
-      { error: "GROQ_API_KEY is missing" },
-      { status: 500 }
-    );
-  }
 
-  const client = new OpenAI({
-    apiKey,
-    baseURL: "https://api.groq.com/openai/v1",
-  });
-    const completion = await client.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a professional EV showroom copywriter. Generate attractive scooter descriptions between 60 and 100 words.",
-        },
-        {
-          role: "user",
-          content: `
+    const prompt = `
+Generate a professional scooter showroom description.
+
 Scooter Name: ${name}
 Range: ${range} km
 Top Speed: ${topSpeed} km/h
 Battery: ${battery}
-`,
-        },
-      ],
+
+Keep it between 60-100 words.
+Make it attractive and customer-friendly.
+`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
     });
 
     return NextResponse.json({
-      description:
-        completion.choices[0].message.content,
+      description: response.text,
     });
-  } catch (err) {
-    console.error(err);
-
+  } catch (error) {
     return NextResponse.json(
       { error: "Failed to generate description" },
       { status: 500 }
     );
   }
-  
 }
