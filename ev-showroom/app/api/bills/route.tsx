@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import renderInvoice from "@/lib/renderVoice";
 import getBrowser from "@/lib/browser";
+import InvoiceTemplate from "@/lib/invoiceTemplate";
+
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,15 +11,14 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const html = renderInvoice(body);
-
     const browser = await getBrowser();
 
     const page = await browser.newPage();
 
-    await page.setContent(html,{
-        waitUntil:"networkidle0"
-    });
+
+    const html = InvoiceTemplate(body);
+
+await page.setContent(html)
 
     const pdf = await page.pdf({
 

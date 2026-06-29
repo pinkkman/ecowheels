@@ -23,344 +23,230 @@ export default function InvoiceTemplate({
   invoiceDate,
   products,
   total,
-}: InvoiceProps) {
-  return (
+}: InvoiceProps): string {
+  const productRows = products
+    .map(
+      (item, index) => `
+        <tr>
+          <td class="center">${index + 1}</td>
+          <td class="description">
+            <div class="product-title">${item.title}</div>
+            <div class="product-details">${item.details.replace(/\n/g, "<br/>")}</div>
+          </td>
+          <td class="center">${item.qty}</td>
+          <td class="amount">₹ ${item.amount.toLocaleString("en-IN")}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+  const emptyRowsCount = Math.max(0, 8 - products.length);
+  const emptyRows = Array.from({ length: emptyRowsCount })
+    .map(
+      () => `
+        <tr>
+          <td style="height: 60px;"></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      `
+    )
+    .join("");
+
+  return `
     <html>
       <head>
-        <style>{`
-          *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
           }
-@page{
-    size:A4;
-    margin:10mm;
-}
-
-html,body{
-    width:210mm;
-    min-height:297mm;
-    background:white;
-}
-          body{
-            font-family:Arial, Helvetica, sans-serif;
-            padding:20px;
-            color:#000;
-            background:white;
+          @page {
+            size: A4;
+            margin: 10mm;
           }
-.invoice{
-    border:2px solid black;
-    min-height:275mm;
-    display:flex;
-    flex-direction:column;
-}
-    .products{
-    width:100%;
-    border-collapse:collapse;
-    table-layout:fixed;
-    flex:1;
-}
-          .title{
-            text-align:center;
-            font-size:28px;
-            font-weight:bold;
-            letter-spacing:2px;
-            padding:10px 0;
-            border-bottom:2px solid black;
+          html, body {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
           }
-
-          .header{
-            display:flex;
-            border-bottom:2px solid black;
+          body {
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 20px;
+            color: #000;
+            background: white;
           }
-
-          .logo{
-            width:20%;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            border-right:2px solid black;
-            padding:10px;
+          .invoice {
+            border: 2px solid black;
+            min-height: 275mm;
+            display: flex;
+            flex-direction: column;
           }
-
-          .logo img{
-            width:90px;
+          .products {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            flex: 1;
           }
-
-          .store{
-            width:60%;
-            text-align:center;
-            padding:12px;
-            border-right:2px solid black;
+          .title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            padding: 10px 0;
+            border-bottom: 2px solid black;
           }
-
-          .store h1{
-            font-size:30px;
-            margin-bottom:6px;
+          .header {
+            display: flex;
+            border-bottom: 2px solid black;
           }
-
-          .store p{
-            font-size:14px;
-            line-height:1.6;
+          .logo {
+            width: 20%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 2px solid black;
+            padding: 10px;
           }
-
-          .contact{
-            width:20%;
-            padding:10px;
-            font-size:13px;
-            line-height:1.8;
+          .logo img {
+            width: 90px;
           }
-
-          .bill-section{
-            display:flex;
-            border-bottom:2px solid black;
+          .store {
+            width: 60%;
+            text-align: center;
+            padding: 12px;
+            border-right: 2px solid black;
           }
-
-          .bill-to{
-            width:60%;
-            border-right:2px solid black;
-            padding:12px;
-            min-height:120px;
+          .store h1 {
+            font-size: 30px;
+            margin-bottom: 6px;
           }
-
-          .bill-details{
-            width:40%;
-            padding:12px;
+          .store p {
+            font-size: 14px;
+            line-height: 1.6;
           }
-
-          .heading{
-            font-weight:bold;
-            margin-bottom:10px;
-            border-bottom:1px solid black;
-            padding-bottom:4px;
+          .contact {
+            width: 20%;
+            padding: 10px;
+            font-size: 13px;
+            line-height: 1.8;
           }
-
-          .field{
-            margin-bottom:8px;
-            font-size:14px;
+          .bill-section {
+            display: flex;
+            border-bottom: 2px solid black;
           }
-
-          .label{
-            font-weight:bold;
+          .bill-to {
+            width: 60%;
+            border-right: 2px solid black;
+            padding: 12px;
+            min-height: 120px;
           }
-
-        `}</style>
+          .bill-details {
+            width: 40%;
+            padding: 12px;
+          }
+          .heading {
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid black;
+            padding-bottom: 4px;
+          }
+          .field {
+            margin-bottom: 8px;
+            font-size: 14px;
+          }
+          .label {
+            font-weight: bold;
+          }
+        </style>
       </head>
 
       <body>
+        <div class="invoice">
 
-        <div className="invoice">
+          <!-- Invoice Title -->
+          <div class="title">INVOICE</div>
 
-          {/* Invoice Title */}
-
-          <div className="title">
-            INVOICE
-          </div>
-
-          {/* Header */}
-
-          <div className="header">
-
-            <div className="logo">
-
-              {/* Replace later with your logo */}
-
+          <!-- Header -->
+          <div class="header">
+            <div class="logo">
+              <!-- Replace later with your logo -->
               <img src="/logo.png" />
-
             </div>
 
-            <div className="store">
-
+            <div class="store">
               <h1>HR SALES</h1>
-
               <p>
                 GAFOOR COLONY, UDITNAGAR,
                 <br />
                 ROURKELA, ODISHA - 769012
               </p>
-
-              <p>
-                Email :
-                hr.sales.rkl@gmail.com
-              </p>
-
+              <p>Email : hr.sales.rkl@gmail.com</p>
             </div>
 
-            <div className="contact">
-
+            <div class="contact">
               📞 +91 8917485620
               <br />
-
               📞 +91 8280531114
-
             </div>
-
           </div>
 
-          {/* Bill Details */}
-
-          <div className="bill-section">
-
-            <div className="bill-to">
-
-              <div className="heading">
-                BILL TO
-              </div>
-
-              <div className="field">
-                <span className="label">
-                  Name :
-                </span>{" "}
-                {customerName}
-              </div>
-
-              <div className="field">
-                <span className="label">
-                  Address :
-                </span>{" "}
-                {address}
-              </div>
-
-              <div className="field">
-                <span className="label">
-                  Phone :
-                </span>{" "}
-                {phone}
-              </div>
-
+          <!-- Bill Details -->
+          <div class="bill-section">
+            <div class="bill-to">
+              <div class="heading">BILL TO</div>
+              <div class="field"><span class="label">Name :</span> ${customerName}</div>
+              <div class="field"><span class="label">Address :</span> ${address}</div>
+              <div class="field"><span class="label">Phone :</span> ${phone}</div>
             </div>
 
-            <div className="bill-details">
-
-              <div className="heading">
-                INVOICE DETAILS
-              </div>
-
-              <div className="field">
-                <span className="label">
-                  Bill No :
-                </span>{" "}
-                {billNo}
-              </div>
-
-              <div className="field">
-                <span className="label">
-                  Date :
-                </span>{" "}
-                {invoiceDate}
-              </div>
-
+            <div class="bill-details">
+              <div class="heading">INVOICE DETAILS</div>
+              <div class="field"><span class="label">Bill No :</span> ${billNo}</div>
+              <div class="field"><span class="label">Date :</span> ${invoiceDate}</div>
             </div>
-
-          </div>
-{/* Product Table */}
-
-<table className="products">
-  <thead>
-    <tr>
-      <th style={{ width: "8%" }}>SL.</th>
-      <th style={{ width: "62%" }}>DESCRIPTION</th>
-      <th style={{ width: "10%" }}>UN.</th>
-      <th style={{ width: "20%" }}>AMOUNT</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    {products.map((item, index) => (
-      <tr key={index}>
-        <td className="center">
-          {index + 1}
-        </td>
-
-        <td className="description">
-          <div className="product-title">
-            {item.title}
           </div>
 
-          <div
-            className="product-details"
-            dangerouslySetInnerHTML={{
-              __html: item.details.replace(/\n/g, "<br/>"),
-            }}
-          />
-        </td>
+          <!-- Product Table -->
+          <table class="products">
+            <thead>
+              <tr>
+                <th style="width: 8%;">SL.</th>
+                <th style="width: 62%;">DESCRIPTION</th>
+                <th style="width: 10%;">UN.</th>
+                <th style="width: 20%;">AMOUNT</th>
+              </tr>
+            </thead>
 
-        <td className="center">
-          {item.qty}
-        </td>
+            <tbody>
+              ${productRows}
+              ${emptyRows}
+            </tbody>
 
-        <td className="amount">
-          ₹ {item.amount.toLocaleString("en-IN")}
-        </td>
-      </tr>
-    ))}
+            <tfoot>
+              <tr>
+                <td colspan="3" class="total-text">TOTAL</td>
+                <td class="total-value">₹ ${total.toLocaleString("en-IN")}</td>
+              </tr>
+            </tfoot>
+          </table>
 
-    {/* Empty rows so Total always stays at bottom */}
+          <!-- Signature -->
+          <div class="signature">
+            <div>Customer Signature</div>
+            <div>Authorized Signature</div>
+          </div>
 
-    {Array.from({
-      length: Math.max(0, 8 - products.length),
-    }).map((_, index) => (
-      <tr key={`empty-${index}`}>
-        <td style={{ height: "60px" }}></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-    ))}
-  </tbody>
-
-  <tfoot>
-    <tr>
-      <td
-        colSpan={3}
-        className="total-text"
-      >
-        TOTAL
-      </td>
-
-      <td className="total-value">
-        ₹ {total.toLocaleString("en-IN")}
-      </td>
-    </tr>
-  </tfoot>
-</table>
-
-{/* Signature */}
-
-<div className="signature">
-
-  <div>
-
-    Customer Signature
-
-  </div>
-
-  <div>
-
-    Authorized Signature
-
-  </div>
-
-</div>
-
-{/* Footer */}
-
-<div className="footer">
-
-  <div>
-    Thanks for doing business with us.
-  </div>
-
-  <div>
-    <strong>HR SALES</strong>
-  </div>
-
-</div>
+          <!-- Footer -->
+          <div class="footer">
+            <div>Thanks for doing business with us.</div>
+            <div><strong>HR SALES</strong></div>
+          </div>
 
         </div>
-
       </body>
     </html>
-  );
+  `;
 }
