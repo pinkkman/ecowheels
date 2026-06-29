@@ -482,8 +482,12 @@ export default function Home() {
               <div className="map-frame">
                 <iframe
                     title="Eco Wheels Rourkela location"
+<<<<<<< HEAD
                 src="https://www.google.com/maps?q=22.2273097,84.8434847&output=embed"
                 
+=======
+src="https://www.google.com/maps?q=22.2273097,84.8434847&output=embed"
+>>>>>>> b183543 (fixed location)
                     width="100%"
                     height="190"
                     style={{ border: 0, display: "block" }}
