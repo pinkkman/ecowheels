@@ -277,6 +277,12 @@ export default async function Dashboard() {
                         <span style={{ fontSize: "1.1rem", lineHeight: 1 }}>+</span>
                         Add Scooter
                     </Link>
+                    <Link
+    href="/admin/bills"
+    className="btn-add"
+>
+    Generate Bill
+</Link>
                 </div>
 
                 <div className="divider" />
