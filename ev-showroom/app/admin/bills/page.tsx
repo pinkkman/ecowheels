@@ -7,7 +7,7 @@ export default function BillsPage() {
         Generate Bill
       </h1>
 
-      <BillForm />
+      {/* <BillForm /> */}
     </div>
   );
 }
