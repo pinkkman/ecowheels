@@ -31,18 +31,18 @@ export async function POST(req: NextRequest) {
 
 await page.setContent(html, { waitUntil: "domcontentloaded" });
 
-    const pdf = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      margin: {
-        top: "0px",
-        bottom: "0px",
-        left: "0px",
-        right: "0px",
-      },
-    });
+  const pdfBuffer = Buffer.from(await page.pdf({
+     format: "A4",
+  printBackground: true,
+  margin: {
+    top: "0px",
+    bottom: "0px",
+    left: "0px",
+    right: "0px",
+  },
+}));
 
-    return new NextResponse(pdf, {
+    return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
