@@ -19,34 +19,24 @@ export async function POST(req: NextRequest) {
     const html = InvoiceTemplate(body);
 
 await page.setContent(html)
+const pdf = await page.pdf({
+  format: "A4",
+  printBackground: true,
+  margin: {
+    top: "0",
+    right: "0",
+    bottom: "0",
+    left: "0",
+  },
+});
 
-    const pdf = await page.pdf({
+await browser.close();
 
-        format:"A4",
+const buffer = Buffer.from(pdf);
 
-        printBackground:true,
-
-        margin:{
-            top:"0",
-            right:"0",
-            bottom:"0",
-            left:"0",
-        }
-
-    });
-
-    await browser.close();
-
-    return new NextResponse(pdf,{
-
-        headers:{
-
-            "Content-Type":"application/pdf",
-
-            "Content-Disposition":`attachment; filename="${body.billNo}.pdf"`
-
-        }
-
-    });
-
-}
+return new NextResponse(buffer, {
+  headers: {
+    "Content-Type": "application/pdf",
+    "Content-Disposition": `attachment; filename="${body.billNo}.pdf"`,
+  },
+});}
