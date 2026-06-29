@@ -1,42 +1,63 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import getBrowser from "@/lib/browser";
-import InvoiceTemplate from "@/lib/invoiceTemplate";
-
+import { launchBrowser } from "@/lib/browser";
+import invoiceTemplate from "@/lib/invoiceTemplate";
+import type { InvoiceData } from "@/lib/invoiceTemplate";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
+  let browser;
 
-    const body = await req.json();
+  try {
+    const data: InvoiceData = await req.json();
 
-    const browser = await getBrowser();
+    if (
+      !data.customerName ||
+      !data.billNo ||
+      !data.invoiceDate ||
+      !data.products?.length
+    ) {
+      return NextResponse.json(
+        { error: "Missing required invoice fields." },
+        { status: 400 }
+      );
+    }
 
+    const html = invoiceTemplate(data);
+
+    browser = await launchBrowser();
     const page = await browser.newPage();
 
+    await page.setContent(html, { waitUntil: "networkidle0" });
 
-    const html = InvoiceTemplate(body);
+    const pdf = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: {
+        top: "0px",
+        bottom: "0px",
+        left: "0px",
+        right: "0px",
+      },
+    });
 
-await page.setContent(html)
-const pdf = await page.pdf({
-  format: "A4",
-  printBackground: true,
-  margin: {
-    top: "0",
-    right: "0",
-    bottom: "0",
-    left: "0",
-  },
-});
-
-await browser.close();
-
-const buffer = Buffer.from(pdf);
-
-return new NextResponse(buffer, {
-  headers: {
-    "Content-Type": "application/pdf",
-    "Content-Disposition": `attachment; filename="${body.billNo}.pdf"`,
-  },
-});}
+    return new NextResponse(pdf, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="invoice-${data.billNo}.pdf"`,
+      },
+    });
+  } catch (err) {
+    console.error("[/api/bills] PDF generation failed:", err);
+    return NextResponse.json(
+      { error: "Failed to generate PDF." },
+      { status: 500 }
+    );
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+}

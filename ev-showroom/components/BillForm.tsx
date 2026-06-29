@@ -2,247 +2,305 @@
 
 import { useState } from "react";
 
-type Product = {
+interface Product {
   title: string;
   details: string;
   qty: number;
   amount: number;
-};
-export default function BillForm() {
-  const [customerName, setCustomerName] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [billNo, setBillNo] = useState("");
-  const [invoiceDate, setInvoiceDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+}
 
-  const [products, setProducts] = useState<Product[]>([
-  {
-    title: "",
-    details: "",
-    qty: 1,
-    amount: 0,
-  },
-]);
+interface FormData {
+  customerName: string;
+  phone: string;
+  address: string;
+  billNo: string;
+  invoiceDate: string;
+  products: Product[];
+}
 
-  const updateProduct = (
-    index: number,
-    field: keyof Product,
-    value: string | number
-  ) => {
-    const copy = [...products];
-
-    copy[index] = {
-      ...copy[index],
-      [field]: value,
-    };
-
-    setProducts(copy);
-  };
-
-  const addProduct = () => {
-    setProducts([
-      ...products,
-     {
+const defaultProduct = (): Product => ({
   title: "",
   details: "",
   qty: 1,
   amount: 0,
-},
-    ]);
+});
+
+const defaultForm = (): FormData => ({
+  customerName: "",
+  phone: "",
+  address: "",
+  billNo: "",
+  invoiceDate: new Date().toISOString().split("T")[0],
+  products: [defaultProduct()],
+});
+
+export default function BillForm() {
+  const [form, setForm] = useState<FormData>(defaultForm());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const updateField = (field: keyof Omit<FormData, "products">, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const updateProduct = (index: number, field: keyof Product, value: string | number) => {
+    setForm((prev) => {
+      const products = [...prev.products];
+      products[index] = { ...products[index], [field]: value };
+      return { ...prev, products };
+    });
+  };
+
+  const addProduct = () => {
+    setForm((prev) => ({
+      ...prev,
+      products: [...prev.products, defaultProduct()],
+    }));
   };
 
   const removeProduct = (index: number) => {
-    const copy = [...products];
-    copy.splice(index, 1);
-    setProducts(copy);
+    setForm((prev) => ({
+      ...prev,
+      products: prev.products.filter((_, i) => i !== index),
+    }));
   };
 
-  const total = products.reduce(
-    (sum, item) => sum + Number(item.amount),
-    0
-  );
-const generateBill = async () => {
-  const body = {
-    customerName,
-    address,
-    phone,
-    billNo,
-    invoiceDate,
-    products,
-    total,
+  const total = form.products.reduce((sum, p) => sum + Number(p.amount), 0);
+
+  const handleSubmit = async () => {
+    setError(null);
+
+    if (!form.customerName.trim()) return setError("Customer name is required.");
+    if (!form.billNo.trim()) return setError("Bill number is required.");
+    if (!form.invoiceDate) return setError("Invoice date is required.");
+    if (form.products.some((p) => !p.title.trim())) {
+      return setError("All products must have a title.");
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/bills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Failed to generate PDF.");
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `invoice-${form.billNo}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const res = await fetch("/api/bills", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    alert("Failed to generate bill");
-    return;
-  }
-
-  const blob = await res.blob();
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${billNo || "Invoice"}.pdf`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-
-  URL.revokeObjectURL(url);
-};
   return (
-    <div className="space-y-6">
+    <div className="max-w-3xl mx-auto p-6 space-y-8">
 
-      {/* Customer */}
+      {/* Customer Details */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">
+          Customer Details
+        </h2>
 
-      <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Customer Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.customerName}
+              onChange={(e) => updateField("customerName", e.target.value)}
+              placeholder="John Doe"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
-        <input
-          className="border rounded-lg p-3"
-          placeholder="Customer Name"
-          value={customerName}
-          onChange={(e) => setCustomerName(e.target.value)}
-        />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone
+            </label>
+            <input
+              type="text"
+              value={form.phone}
+              onChange={(e) => updateField("phone", e.target.value)}
+              placeholder="+880 1XXX-XXXXXX"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
 
-        <input
-          className="border rounded-lg p-3"
-          placeholder="Phone Number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Address
+          </label>
+          <textarea
+            value={form.address}
+            onChange={(e) => updateField("address", e.target.value)}
+            placeholder="123 Street, City, Country"
+            rows={2}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          />
+        </div>
 
-        <input
-          className="border rounded-lg p-3"
-          placeholder="Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bill No <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.billNo}
+              onChange={(e) => updateField("billNo", e.target.value)}
+              placeholder="INV-001"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
-        <input
-          className="border rounded-lg p-3"
-          placeholder="Bill Number"
-          value={billNo}
-          onChange={(e) => setBillNo(e.target.value)}
-        />
-
-        <input
-          className="border rounded-lg p-3"
-          type="date"
-          value={invoiceDate}
-          onChange={(e) => setInvoiceDate(e.target.value)}
-        />
-
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Invoice Date <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              value={form.invoiceDate}
+              onChange={(e) => updateField("invoiceDate", e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Products */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">
+          Products
+        </h2>
 
-      <div className="border rounded-xl p-5">
-
-        <div className="grid grid-cols-12 gap-3 font-semibold mb-4">
-
-          <div className="col-span-6">
-            Product
-          </div>
-
-          <div className="col-span-2">
-            Qty
-          </div>
-
-          <div className="col-span-3">
-            Amount
-          </div>
-
-          <div className="col-span-1"></div>
-
-        </div>
-
-        {products.map((product, index) => (
+        {form.products.map((product, index) => (
           <div
             key={index}
-            className="grid grid-cols-12 gap-3 mb-3"
+            className="border border-gray-100 rounded-lg p-4 space-y-3 bg-gray-50"
           >
-            <input
-              className="col-span-6 border rounded-lg p-2"
-              placeholder="Product"
-              value={product.title}
-              onChange={(e) =>
-                updateProduct(index, "title", e.target.value)
-              }
-            />
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-600">
+                Item #{index + 1}
+              </span>
+              {form.products.length > 1 && (
+                <button
+                  onClick={() => removeProduct(index)}
+                  className="text-red-500 text-xs hover:underline"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
 
-            <input
-              className="col-span-2 border rounded-lg p-2"
-              type="number"
-              value={product.qty}
-              onChange={(e) =>
-                updateProduct(
-                  index,
-                  "qty",
-                  Number(e.target.value)
-                )
-              }
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={product.title}
+                onChange={(e) => updateProduct(index, "title", e.target.value)}
+                placeholder="Product name"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+            </div>
 
-            <input
-              className="col-span-3 border rounded-lg p-2"
-              type="number"
-              value={product.amount}
-              onChange={(e) =>
-                updateProduct(
-                  index,
-                  "amount",
-                  Number(e.target.value)
-                )
-              }
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Details
+              </label>
+              <textarea
+                value={product.details}
+                onChange={(e) => updateProduct(index, "details", e.target.value)}
+                placeholder="Additional description (optional)"
+                rows={2}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-white"
+              />
+            </div>
 
-            <button
-              className="bg-red-500 text-white rounded-lg"
-              onClick={() => removeProduct(index)}
-            >
-              X
-            </button>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Qty
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={product.qty}
+                  onChange={(e) =>
+                    updateProduct(index, "qty", Number(e.target.value))
+                  }
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Amount (৳)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={product.amount}
+                  onChange={(e) =>
+                    updateProduct(index, "amount", Number(e.target.value))
+                  }
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                />
+              </div>
+            </div>
           </div>
         ))}
 
         <button
           onClick={addProduct}
-          className="mt-3 bg-blue-600 text-white px-5 py-2 rounded-lg"
+          className="w-full border-2 border-dashed border-gray-300 rounded-lg py-2 text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors"
         >
           + Add Product
         </button>
 
+        {/* Running Total */}
+        <div className="flex justify-end pt-2">
+          <div className="text-sm font-semibold text-gray-700">
+            Total:{" "}
+            <span className="text-lg font-bold text-gray-900">
+              ৳ {total.toLocaleString()}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Total */}
+      {/* Error */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+          {error}
+        </div>
+      )}
 
-      <div className="flex justify-end text-2xl font-bold">
-        Total : ₹ {total.toLocaleString()}
-      </div>
-
-      {/* Button */}
-
-      <div className="flex justify-end">
-
-        <button
-          onClick={generateBill}
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl"
-        >
-          Generate PDF
-        </button>
-
-      </div>
-
+      {/* Submit */}
+      <button
+        onClick={handleSubmit}
+        disabled={loading}
+        className="w-full bg-gray-900 text-white font-semibold py-3 rounded-xl hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm tracking-wide"
+      >
+        {loading ? "Generating PDF..." : "Generate PDF"}
+      </button>
     </div>
   );
 }

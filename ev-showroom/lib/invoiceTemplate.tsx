@@ -1,252 +1,364 @@
-type Product = {
+export interface Product {
   title: string;
   details: string;
   qty: number;
   amount: number;
-};
+}
 
-type InvoiceProps = {
+export interface InvoiceData {
   customerName: string;
-  address: string;
   phone: string;
+  address: string;
   billNo: string;
   invoiceDate: string;
   products: Product[];
-  total: number;
-};
+}
 
-export default function InvoiceTemplate({
-  customerName,
-  address,
-  phone,
-  billNo,
-  invoiceDate,
-  products,
-  total,
-}: InvoiceProps): string {
-  const productRows = products
+export default function invoiceTemplate(data: InvoiceData): string {
+  const totalAmount = data.products.reduce((sum, p) => sum + p.amount, 0);
+
+  const rows = data.products
     .map(
-      (item, index) => `
+      (p, i) => `
         <tr>
-          <td class="center">${index + 1}</td>
-          <td class="description">
-            <div class="product-title">${item.title}</div>
-            <div class="product-details">${item.details.replace(/\n/g, "<br/>")}</div>
+          <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; vertical-align: top;">${i + 1}</td>
+          <td style="padding: 8px 6px; border: 1px solid #ddd; vertical-align: top;">
+            <div style="font-weight: 600;">${p.title}</div>
+            ${p.details ? `<div style="font-size: 12px; color: #444; margin-top: 3px; white-space: pre-line;">${p.details}</div>` : ""}
           </td>
-          <td class="center">${item.qty}</td>
-          <td class="amount">₹ ${item.amount.toLocaleString("en-IN")}</td>
-        </tr>
-      `
-    )
-    .join("");
-
-  const emptyRowsCount = Math.max(0, 8 - products.length);
-  const emptyRows = Array.from({ length: emptyRowsCount })
-    .map(
-      () => `
-        <tr>
-          <td style="height: 60px;"></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; vertical-align: top;">${p.qty}</td>
+          <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: right; vertical-align: top;">৳ ${p.amount.toLocaleString()}</td>
         </tr>
       `
     )
     .join("");
 
   return `
-    <html>
-      <head>
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          @page {
-            size: A4;
-            margin: 10mm;
-          }
-          html, body {
-            width: 210mm;
-            min-height: 297mm;
-            background: white;
-          }
-          body {
-            font-family: Arial, Helvetica, sans-serif;
-            padding: 20px;
-            color: #000;
-            background: white;
-          }
-          .invoice {
-            border: 2px solid black;
-            min-height: 275mm;
-            display: flex;
-            flex-direction: column;
-          }
-          .products {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            flex: 1;
-          }
-          .title {
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            padding: 10px 0;
-            border-bottom: 2px solid black;
-          }
-          .header {
-            display: flex;
-            border-bottom: 2px solid black;
-          }
-          .logo {
-            width: 20%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-right: 2px solid black;
-            padding: 10px;
-          }
-          .logo img {
-            width: 90px;
-          }
-          .store {
-            width: 60%;
-            text-align: center;
-            padding: 12px;
-            border-right: 2px solid black;
-          }
-          .store h1 {
-            font-size: 30px;
-            margin-bottom: 6px;
-          }
-          .store p {
-            font-size: 14px;
-            line-height: 1.6;
-          }
-          .contact {
-            width: 20%;
-            padding: 10px;
-            font-size: 13px;
-            line-height: 1.8;
-          }
-          .bill-section {
-            display: flex;
-            border-bottom: 2px solid black;
-          }
-          .bill-to {
-            width: 60%;
-            border-right: 2px solid black;
-            padding: 12px;
-            min-height: 120px;
-          }
-          .bill-details {
-            width: 40%;
-            padding: 12px;
-          }
-          .heading {
-            font-weight: bold;
-            margin-bottom: 10px;
-            border-bottom: 1px solid black;
-            padding-bottom: 4px;
-          }
-          .field {
-            margin-bottom: 8px;
-            font-size: 14px;
-          }
-          .label {
-            font-weight: bold;
-          }
-        </style>
-      </head>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Invoice #${data.billNo}</title>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
 
-      <body>
-        <div class="invoice">
+        body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          font-size: 14px;
+          color: #111;
+          background: #fff;
+          padding: 40px;
+          width: 794px;
+        }
 
-          <!-- Invoice Title -->
-          <div class="title">INVOICE</div>
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 3px solid #1a1a2e;
+          padding-bottom: 20px;
+          margin-bottom: 24px;
+        }
 
-          <!-- Header -->
-          <div class="header">
-            <div class="logo">
-              <!-- Replace later with your logo -->
-              <img src="/logo.png" />
-            </div>
+        .logo-block {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
 
-            <div class="store">
-              <h1>HR SALES</h1>
-              <p>
-                GAFOOR COLONY, UDITNAGAR,
-                <br />
-                ROURKELA, ODISHA - 769012
-              </p>
-              <p>Email : hr.sales.rkl@gmail.com</p>
-            </div>
+        .logo-block img {
+          height: 64px;
+          width: 64px;
+          object-fit: contain;
+        }
 
-            <div class="contact">
-              📞 +91 8917485620
-              <br />
-              📞 +91 8280531114
-            </div>
+        .company-name {
+          font-size: 28px;
+          font-weight: 800;
+          color: #1a1a2e;
+          letter-spacing: 1px;
+        }
+
+        .company-tagline {
+          font-size: 11px;
+          color: #666;
+          margin-top: 2px;
+        }
+
+        .contact-block {
+          text-align: right;
+          font-size: 12px;
+          color: #333;
+          line-height: 1.7;
+        }
+
+        .contact-block a {
+          color: #333;
+          text-decoration: none;
+        }
+
+        .invoice-title {
+          text-align: center;
+          font-size: 18px;
+          font-weight: 700;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: #1a1a2e;
+          margin-bottom: 20px;
+          border: 2px solid #1a1a2e;
+          padding: 6px 0;
+        }
+
+        .bill-meta {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 24px;
+          gap: 20px;
+        }
+
+        .bill-to {
+          flex: 1;
+        }
+
+        .bill-to-label {
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          color: #888;
+          margin-bottom: 6px;
+          letter-spacing: 1px;
+        }
+
+        .bill-to-name {
+          font-size: 16px;
+          font-weight: 700;
+          color: #1a1a2e;
+        }
+
+        .bill-to-detail {
+          font-size: 13px;
+          color: #444;
+          margin-top: 3px;
+          line-height: 1.6;
+        }
+
+        .bill-info {
+          text-align: right;
+          min-width: 180px;
+        }
+
+        .bill-info table {
+          margin-left: auto;
+          border-collapse: collapse;
+        }
+
+        .bill-info td {
+          padding: 2px 6px;
+          font-size: 13px;
+        }
+
+        .bill-info td:first-child {
+          font-weight: 600;
+          color: #555;
+          text-align: left;
+        }
+
+        .bill-info td:last-child {
+          color: #111;
+          text-align: right;
+        }
+
+        .products-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+
+        .products-table thead tr {
+          background: #1a1a2e;
+          color: #fff;
+        }
+
+        .products-table thead th {
+          padding: 10px 8px;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+        }
+
+        .products-table thead th:nth-child(1) { width: 40px; text-align: center; }
+        .products-table thead th:nth-child(2) { text-align: left; }
+        .products-table thead th:nth-child(3) { width: 60px; text-align: center; }
+        .products-table thead th:nth-child(4) { width: 100px; text-align: right; }
+
+        .products-table tbody tr:nth-child(even) {
+          background: #f7f7f7;
+        }
+
+        .total-row {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 40px;
+        }
+
+        .total-box {
+          border: 2px solid #1a1a2e;
+          padding: 10px 20px;
+          min-width: 200px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .total-label {
+          font-size: 14px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #1a1a2e;
+        }
+
+        .total-amount {
+          font-size: 18px;
+          font-weight: 800;
+          color: #1a1a2e;
+        }
+
+        .footer {
+          margin-top: 10px;
+          border-top: 2px solid #1a1a2e;
+          padding-top: 30px;
+        }
+
+        .signatures {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+        }
+
+        .signature-block {
+          text-align: center;
+          min-width: 160px;
+        }
+
+        .signature-line {
+          border-top: 1px solid #333;
+          margin-bottom: 6px;
+        }
+
+        .signature-label {
+          font-size: 12px;
+          font-weight: 600;
+          color: #444;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .footer-note {
+          text-align: center;
+          font-size: 13px;
+          color: #555;
+          margin-bottom: 4px;
+        }
+
+        .footer-brand {
+          text-align: center;
+          font-size: 15px;
+          font-weight: 800;
+          color: #1a1a2e;
+          letter-spacing: 2px;
+        }
+      </style>
+    </head>
+    <body>
+
+      <!-- HEADER -->
+      <div class="header">
+        <div class="logo-block">
+          <img src="https://yourdomain.com/logo.png" alt="HR SALES Logo" />
+          <div>
+            <div class="company-name">HR SALES</div>
+            <div class="company-tagline">Quality Products & Trusted Service</div>
           </div>
-
-          <!-- Bill Details -->
-          <div class="bill-section">
-            <div class="bill-to">
-              <div class="heading">BILL TO</div>
-              <div class="field"><span class="label">Name :</span> ${customerName}</div>
-              <div class="field"><span class="label">Address :</span> ${address}</div>
-              <div class="field"><span class="label">Phone :</span> ${phone}</div>
-            </div>
-
-            <div class="bill-details">
-              <div class="heading">INVOICE DETAILS</div>
-              <div class="field"><span class="label">Bill No :</span> ${billNo}</div>
-              <div class="field"><span class="label">Date :</span> ${invoiceDate}</div>
-            </div>
-          </div>
-
-          <!-- Product Table -->
-          <table class="products">
-            <thead>
-              <tr>
-                <th style="width: 8%;">SL.</th>
-                <th style="width: 62%;">DESCRIPTION</th>
-                <th style="width: 10%;">UN.</th>
-                <th style="width: 20%;">AMOUNT</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              ${productRows}
-              ${emptyRows}
-            </tbody>
-
-            <tfoot>
-              <tr>
-                <td colspan="3" class="total-text">TOTAL</td>
-                <td class="total-value">₹ ${total.toLocaleString("en-IN")}</td>
-              </tr>
-            </tfoot>
-          </table>
-
-          <!-- Signature -->
-          <div class="signature">
-            <div>Customer Signature</div>
-            <div>Authorized Signature</div>
-          </div>
-
-          <!-- Footer -->
-          <div class="footer">
-            <div>Thanks for doing business with us.</div>
-            <div><strong>HR SALES</strong></div>
-          </div>
-
         </div>
-      </body>
+        <div class="contact-block">
+          <div>123 Business Road, Dhaka, Bangladesh</div>
+          <div>+880 1XXX-XXXXXX &nbsp;|&nbsp; +880 1XXX-XXXXXX</div>
+          <div>hrsales@email.com</div>
+        </div>
+      </div>
+
+      <!-- INVOICE TITLE -->
+      <div class="invoice-title">Invoice</div>
+
+      <!-- BILL META -->
+      <div class="bill-meta">
+        <div class="bill-to">
+          <div class="bill-to-label">Bill To</div>
+          <div class="bill-to-name">${data.customerName}</div>
+          <div class="bill-to-detail">${data.address}</div>
+          <div class="bill-to-detail">Phone: ${data.phone}</div>
+        </div>
+        <div class="bill-info">
+          <table>
+            <tr>
+              <td>Bill No:</td>
+              <td><strong>${data.billNo}</strong></td>
+            </tr>
+            <tr>
+              <td>Date:</td>
+              <td>${data.invoiceDate}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRODUCTS TABLE -->
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th>SL</th>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+
+      <!-- TOTAL -->
+      <div class="total-row">
+        <div class="total-box">
+          <span class="total-label">Total</span>
+          <span class="total-amount">৳ ${totalAmount.toLocaleString()}</span>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="footer">
+        <div class="signatures">
+          <div class="signature-block">
+            <div class="signature-line"></div>
+            <div class="signature-label">Customer Signature</div>
+          </div>
+          <div class="signature-block">
+            <div class="signature-line"></div>
+            <div class="signature-label">Authorized Signature</div>
+          </div>
+        </div>
+        <div class="footer-note">Thanks for doing business with us.</div>
+        <div class="footer-brand">HR SALES</div>
+      </div>
+
+    </body>
     </html>
   `;
 }
