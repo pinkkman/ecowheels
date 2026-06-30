@@ -3,18 +3,18 @@ import AdminNavbar from "@/components/AdminNavbar";
 import Providers from "@/components/Providers";
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
-    children: React.ReactNode;
+  children,
+}: Readonly<{
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="en">
+  return (
+    <html lang="en">
+      <body>
         <Providers>
-            <body>
-            <AdminNavbar />
-            {children}
-            </body>
+          <AdminNavbar />
+          {children}
         </Providers>
-        </html>
-    );
+      </body>
+    </html>
+  );
 }
