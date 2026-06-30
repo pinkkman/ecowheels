@@ -278,7 +278,7 @@ export default async function Dashboard() {
                         Add Scooter
                     </Link>
                     <Link
-    href="/admin/bills"
+    href="https://ecoinvoice-xi.vercel.app/admin/bills"
     className="btn-add"
 >
     Generate Bill
