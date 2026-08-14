@@ -147,6 +147,15 @@ export default function LoginPage() {
             Sign Up
           </Link>
         </p>
+        <p className="mt-8 text-center text-gray-600">
+          Forgot Password?{" "}
+          <Link
+              href="/forgot-password"
+              className="font-semibold text-green-600 hover:text-green-700"
+          >
+       Reset Password
+          </Link>
+        </p>
       </div>
     </div>
   );
