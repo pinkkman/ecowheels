@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
 
@@ -58,6 +58,7 @@ export default function ResetPasswordPage() {
             }
 
             setMessage("Password reset successfully! You can now log in.");
+
             setPassword("");
             setConfirmPassword("");
         } catch {
@@ -71,8 +72,11 @@ export default function ResetPasswordPage() {
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center px-4">
             <div className="w-full max-w-md rounded-3xl border border-gray-200 bg-white p-8 shadow-2xl">
 
+                {/* Header */}
                 <div className="mb-8 text-center">
-                    <div className="mb-4 text-5xl">🔐</div>
+                    <div className="mb-4 text-5xl">
+                        🔐
+                    </div>
 
                     <h1 className="text-3xl font-bold text-gray-900">
                         Reset Password
@@ -83,21 +87,25 @@ export default function ResetPasswordPage() {
                     </p>
                 </div>
 
+                {/* Error */}
                 {error && (
                     <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
                         {error}
                     </div>
                 )}
 
+                {/* Success */}
                 {message && (
                     <div className="mb-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
                         {message}
                     </div>
                 )}
 
+                {/* Reset Form */}
                 {!message && (
                     <form onSubmit={handleSubmit} className="space-y-6">
 
+                        {/* New Password */}
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-gray-800">
                                 New Password
@@ -109,10 +117,12 @@ export default function ResetPasswordPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                minLength={6}
                                 className="w-full rounded-2xl border-2 border-gray-300 bg-white px-5 py-4 text-gray-900 placeholder:text-gray-500 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
                             />
                         </div>
 
+                        {/* Confirm Password */}
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-gray-800">
                                 Confirm Password
@@ -124,10 +134,12 @@ export default function ResetPasswordPage() {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
+                                minLength={6}
                                 className="w-full rounded-2xl border-2 border-gray-300 bg-white px-5 py-4 text-gray-900 placeholder:text-gray-500 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
                             />
                         </div>
 
+                        {/* Submit */}
                         <button
                             type="submit"
                             disabled={loading}
@@ -139,6 +151,7 @@ export default function ResetPasswordPage() {
                     </form>
                 )}
 
+                {/* Success → Login */}
                 {message && (
                     <Link
                         href="/login"
@@ -148,7 +161,36 @@ export default function ResetPasswordPage() {
                     </Link>
                 )}
 
+                {/* Footer */}
+                {!message && (
+                    <p className="mt-8 text-center text-gray-600">
+                        Remember your password?{" "}
+                        <Link
+                            href="/login"
+                            className="font-semibold text-green-600 hover:text-green-700"
+                        >
+                            Login
+                        </Link>
+                    </p>
+                )}
+
             </div>
         </div>
+    );
+}
+
+export default function ResetPasswordPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50">
+                    <div className="text-lg font-semibold text-gray-700">
+                        Loading...
+                    </div>
+                </div>
+            }
+        >
+            <ResetPasswordForm />
+        </Suspense>
     );
 }
