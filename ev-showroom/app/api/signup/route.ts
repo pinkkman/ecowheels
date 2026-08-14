@@ -7,9 +7,9 @@ export async function POST(req: Request) {
     try {
         await connectDB();
 
-        const { name, phone, password } = await req.json();
+        const { name, phone, email,password } = await req.json();
 
-        if (!name || !phone || !password) {
+        if (!name || !phone ||!email || !password) {
             return NextResponse.json(
                 {
                     success: false,
@@ -20,6 +20,15 @@ export async function POST(req: Request) {
         }
 
         const existingUser = await User.findOne({ phone });
+const existingEmail=await User.findOne({email});
+if(existingEmail){
+    return NextResponse.json({
+        success: false,
+        message: "Email already exists",
+    }, { status: 400 }
+) ;
+    }
+
 
         if (existingUser) {
             return NextResponse.json(
@@ -36,6 +45,7 @@ export async function POST(req: Request) {
         await User.create({
             name,
             phone,
+            email,
             password: hashedPassword,
             role: "user",
         });

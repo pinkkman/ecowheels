@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
+ const [email,setEmail]=useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState(false);
@@ -65,6 +65,7 @@ export default function SignupPage() {
         body: JSON.stringify({
           name,
           phone: formattedPhone,
+          email,
           password,
         }),
       });
@@ -153,7 +154,21 @@ export default function SignupPage() {
               className="w-full rounded-2xl border-2 border-gray-300 bg-white px-5 py-4 text-gray-900 placeholder:text-gray-500 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
             />
           </div>
+          {/* Email */}
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-gray-800">
+              Email Address
+            </label>
 
+            <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full rounded-2xl border-2 border-gray-300 bg-white px-5 py-4 text-gray-900 placeholder:text-gray-500 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+            />
+          </div>
           {/* Password */}
           <div>
             <label className="mb-2 block text-sm font-semibold text-gray-800">

@@ -87,6 +87,7 @@ export default function Home() {
                 position: "absolute",
                 width: size, height: size,
                 borderRadius: "50%",
+
                 border: "1px solid rgba(139,0,0,0.2)",
                 top: "50%", left: "50%",
                 transform: "translate(-50%,-50%)",
