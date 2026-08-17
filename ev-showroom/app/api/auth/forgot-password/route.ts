@@ -62,7 +62,7 @@ export async function POST(req: Request) {
             `${baseUrl}/reset-password?token=${rawToken}`;
 
         const { data, error } = await resend.emails.send({
-            from: "EcoWheels <onboarding@resend.dev>",
+            from: "EcoWheels <noreply@ecowheels.app>",
             to: [normalizedEmail],
             subject: "Reset your EcoWheels password",
             html: `
